@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Card } from '../../types/card';
+import { ThemeSelectorComponent } from '../../components/themeSelector/themeSelector.component';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ThemeSelectorComponent],
   templateUrl: './board.component.html',
 })
 export class BoardComponent {
@@ -14,6 +15,7 @@ export class BoardComponent {
   timerInterval: any;
   timeElapsed: string = '00:00';
   isLocked: boolean = false;
+  currentTheme: string = 'one-piece';
 
   constructor() {
     this.createCards(16);
@@ -31,18 +33,23 @@ export class BoardComponent {
 
   createCards(cardNumber: number) {
     const cards: Card[] = [];
-
+      const prefix = {
+        'one-piece': 'OP',
+        pokemon: 'PKMN',
+        'final-fantasy': 'FF',
+      }[this.currentTheme];
     for(let i = 0; i < cardNumber / 2; i++) {
+
 
       const card1: Card = {
         id: i,
-        image: `/img/cards/one-piece/OP${i + 1}.png`,
+        image: `/img/cards/${this.currentTheme}/${prefix}${i + 1}.png`,
         isFlipped: false,
         isMatched: false
       };
 
       const card2: Card = {
-        ...card1 // The second card will be same as the first
+        ...card1
       };
 
       cards.push(card1, card2);
@@ -120,5 +127,10 @@ export class BoardComponent {
         }, 1000);
       }
     }
+  }
+
+  onThemeChanged(theme: string) {
+    this.currentTheme = theme;
+    this.resetGame();
   }
 }
