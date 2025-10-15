@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Card } from '../../types/card';
 import { ThemeSelectorComponent } from '../../components/themeSelector/themeSelector.component';
@@ -9,17 +9,58 @@ import { ThemeSelectorComponent } from '../../components/themeSelector/themeSele
   imports: [CommonModule, ThemeSelectorComponent],
   templateUrl: './board.component.html',
 })
-export class BoardComponent {
+export class BoardComponent implements OnInit {
   cards: Card[] = [];
   timer: number = 0;
   timerInterval: any;
   timeElapsed: string = '00:00';
   isLocked: boolean = false;
   currentTheme: string = 'one-piece';
+  isLoading: boolean = true;
+  loadingProgress: number = 0;
+  totalImages: number = 0;
+  loadedImages: number = 0;
 
   constructor() {
     this.createCards(16);
     this.startTimer();
+  }
+
+  ngOnInit() {
+    this.preloadImages();
+  }
+
+  private preloadImages() {
+    this.isLoading = true;
+    this.loadedImages = 0;
+
+    const themes = {
+      'one-piece': 'OP',
+      pokemon: 'PKMN',
+      'final-fantasy': 'FF',
+    };
+
+    // Calculate total images to load
+    this.totalImages = Object.keys(themes).length * (this.cards.length / 2);
+
+    // Preload all themes
+    Object.entries(themes).forEach(([theme, prefix]) => {
+      for (let i = 1; i <= this.cards.length / 2; i++) {
+        const img = new Image();
+        img.onload = () => {
+          this.loadedImages++;
+          this.loadingProgress = Math.round((this.loadedImages / this.totalImages) * 100);
+          if (this.loadedImages === this.totalImages) {
+            this.isLoading = false;
+          }
+        };
+        img.onerror = () => {
+          this.loadedImages++;
+          this.loadingProgress = Math.round((this.loadedImages / this.totalImages) * 100);
+        };
+        img.src = `/img/cards/${theme}/${prefix}${i}.png`;
+      }
+    });
   }
 
   flipCard(card: Card) {
@@ -132,5 +173,6 @@ export class BoardComponent {
   onThemeChanged(theme: string) {
     this.currentTheme = theme;
     this.resetGame();
+    this.preloadImages(); // Preload images when theme changes
   }
 }
