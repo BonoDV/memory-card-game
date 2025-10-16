@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Card } from '../../types/card';
 import { ThemeSelectorComponent } from '../../components/themeSelector/themeSelector.component';
+import { CardSelectorComponent } from '../card-selector/card-selector.component';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [CommonModule, ThemeSelectorComponent],
+  imports: [CommonModule, ThemeSelectorComponent, CardSelectorComponent],
   templateUrl: './board.component.html',
 })
 export class BoardComponent implements OnInit {
@@ -31,8 +32,10 @@ export class BoardComponent implements OnInit {
   }
 
   private preloadImages() {
+    // Reset counters
     this.isLoading = true;
     this.loadedImages = 0;
+    this.loadingProgress = 0;
 
     const themes = {
       'one-piece': 'OP',
@@ -40,12 +43,13 @@ export class BoardComponent implements OnInit {
       'final-fantasy': 'FF',
     };
 
-    // Calculate total images to load
-    this.totalImages = Object.keys(themes).length * (this.cards.length / 2);
+    // Calculate total images to load based on current cards length
+    const pairsCount = this.cards.length / 2;
+    this.totalImages = Object.keys(themes).length * pairsCount;
 
     // Preload all themes
     Object.entries(themes).forEach(([theme, prefix]) => {
-      for (let i = 1; i <= this.cards.length / 2; i++) {
+      for (let i = 1; i <= pairsCount; i++) {
         const img = new Image();
         img.onload = () => {
           this.loadedImages++;
@@ -57,6 +61,9 @@ export class BoardComponent implements OnInit {
         img.onerror = () => {
           this.loadedImages++;
           this.loadingProgress = Math.round((this.loadedImages / this.totalImages) * 100);
+          if (this.loadedImages === this.totalImages) {
+            this.isLoading = false;
+          }
         };
         img.src = `/img/cards/${theme}/${prefix}${i}.png`;
       }
@@ -174,5 +181,11 @@ export class BoardComponent implements OnInit {
     this.currentTheme = theme;
     this.resetGame();
     this.preloadImages(); // Preload images when theme changes
+  }
+
+  onCardNumberChanged(cardNumber: number) {
+    this.resetGame();
+    this.createCards(cardNumber);
+    this.preloadImages();
   }
 }

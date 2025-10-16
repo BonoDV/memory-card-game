@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="flex gap-4 justify-center mb-8">
+    <div class="flex gap-4 justify-center items-center mb-8 mt-8">
       <button
         (click)="selectTheme('one-piece')"
         class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
