@@ -21,6 +21,7 @@ export class BoardComponent implements OnInit {
   loadingProgress: number = 0;
   totalImages: number = 0;
   loadedImages: number = 0;
+  backgroundImage: string = '/img/background/one-piece/background.png';
 
   constructor() {
     this.createCards(16);
@@ -179,6 +180,7 @@ export class BoardComponent implements OnInit {
 
   onThemeChanged(theme: string) {
     this.currentTheme = theme;
+    this.backgroundImage = `/img/background/${theme}/background.png`;
     this.resetGame();
     this.preloadImages(); // Preload images when theme changes
   }

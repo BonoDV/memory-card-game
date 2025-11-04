@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-100 p-4">
+<div class="min-h-screen p-4 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out" [style.background-image]="'url(' + backgroundImage + ')'">
   <div class="flex justify-center items-center gap-6 mb-4">
     <app-theme-selector (themeChanged)="onThemeChanged($event)"></app-theme-selector>
     <app-card-selector (cardNumberChanged)="onCardNumberChanged($event)"></app-card-selector>
